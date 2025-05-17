@@ -102,11 +102,20 @@ You may also look at the python files to examine the models individually.
 
 ![alt text](training_history_transformer.png)
 
-![alt text](bit_position_accuracy.png)
+![alt text](bit_position_accuracy_transformer.png)
 
 Once again, we can see that we are no better than a coin toss. This isn't exactly a failure and, in fact, just shows the robust and secure nature of AES. These results are exactly what would be expected in an initial experiement.
 
-Further Research
+## Hybrid Model
+
+![alt text](training_history_hybrid.png)
+
+![alt text](bit_position_accuracy_hybrid.png)
+
+This is quite promising! In fact, the model was able to predict more than one bit. We will retrain this model incrementally until it stalls. 
+
+
+### Further Research
 
 1. **Focus on Specific AES Components**: Target specific AES operations (SubBytes, ShiftRows, etc.) instead of the entire encryption process
 
