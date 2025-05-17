@@ -68,4 +68,57 @@ np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
 
 ![alt text](training_history.png)
 
--
+```
+accuracy: 9.2557e-04 - auc: 0.5004 - loss: 0.6934 - precision: 0.5004 - recall: 0.4524
+```
+
+- As we can see, the model is essentially unable to predict anything higher 50%
+- We may as well be flipping a coin, with zero bits predicted correctly.
+- In the next iteration, we will use AI to optimize and create a transformer model.
+
+## Updating the model
+
+- We now have a choice of 4 architectures (CNN, Dense, Transformer, and Hybrid)
+- We will also reduce the problem size by trying to predict only the first 32 bits instead of all 128.
+
+Without going into the optimizations in the program itself such as sample creation, callback, model caching, and GPU utilization here are the basic parameters:
+
+```python
+# Configuration parameters
+NUM_SAMPLES = 1000000  # 1M samples
+EPOCHS = 100
+BATCH_SIZE = 512  # Optimized for RTX 3070
+MIXED_PRECISION = True
+LEARNING_RATE = 2e-3
+MODEL_TYPE = "transformer"  # Options: "dense", "cnn", "transformer", "hybrid"
+XLA_ACCELERATION = True
+MAX_BITS_TO_PREDICT = 32
+MODEL_COMPLEXITY = "ultra"  # Options: "normal", "high", "ultra"
+```
+
+You may also look at the python files to examine the models individually.
+
+## Transformer Model
+
+![alt text](training_history_transformer.png)
+
+![alt text](bit_position_accuracy.png)
+
+Once again, we can see that we are no better than a coin toss. This isn't exactly a failure and, in fact, just shows the robust and secure nature of AES. These results are exactly what would be expected in an initial experiement.
+
+Further Research
+
+1. **Focus on Specific AES Components**: Target specific AES operations (SubBytes, ShiftRows, etc.) instead of the entire encryption process
+
+2. **Reduce Problem Scope**: Try predicting even fewer bits (8 or 16) to further concentrate learning capacity
+
+3. **Explore Adversarial Approaches**: Implement a GAN-like architecture with competing networks
+
+4. **Analyze Round Keys**: Focus on the key expansion algorithm which might have more learnable patterns
+
+5. **Compute Correlation Analysis**: Add mutual information calculations between input bits and output bits
+
+
+
+
+
