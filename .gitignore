@@ -1,0 +1,3 @@
+aes_nn_models/
+*.keras
+logs/
