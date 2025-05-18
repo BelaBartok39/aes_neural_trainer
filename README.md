@@ -56,7 +56,7 @@ np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
                   metrics=['accuracy']) # 'accuracy' here is bitwise accuracy
     return model
 ```
-![alt text](image.png)
+![alt text](images/image.png)
 
 1. Initial model was a Keras Sequential with 2 hidden layers (1024 units each, ReLU), a smaller hidden layer (512 units, ReLU), and an output layer (128 units, sigmoid). Also added Batch Normalization and Dropout. 
 2. For training, I used the Adam optimizer and binary cross-entropy loss, also stopping early if enough epochs went by without a drop in validation loss.
@@ -66,7 +66,7 @@ np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
 
 ## Initial Results
 
-![alt text](training_history.png)
+![alt text](images/training_history.png)
 
 ```
 accuracy: 9.2557e-04 - auc: 0.5004 - loss: 0.6934 - precision: 0.5004 - recall: 0.4524
@@ -100,24 +100,24 @@ You may also look at the python files to examine the models individually.
 
 ## Transformer Model
 
-![alt text](training_history_transformer.png)
+![alt text](images/training_history_transformer.png)
 
-![alt text](bit_position_accuracy_transformer.png)
+![alt text](images/bit_position_accuracy_transformer.png)
 
 Once again, we can see that we are no better than a coin toss. This isn't exactly a failure and, in fact, just shows the robust and secure nature of AES. These results are exactly what would be expected in an initial experiement.
 
 ## Hybrid Model
 
-![alt text](training_history_hybrid.png)
+![alt text](images/training_history_hybrid.png)
 
-![alt text](bit_position_accuracy_hybrid.png)
+![alt text](images/bit_position_accuracy_hybrid.png)
 
 This is quite promising! In fact, the model was able to predict more than one bit. We will retrain this model incrementally until it stalls. 
 
 ## CNN Model
 
-![alt text](training_history_cnn.png)
-![alt text](bit_position_accuracy_cnn.png)
+![alt text](images/training_history_cnn.png)
+![alt text](images/bit_position_accuracy_cnn.png)
 
 This is quite unbelievable, almost too good to be true. We need to verify that we didn't just get a good initialization and that these results hold up under scrutiny.
 Naturally this means our next step is to expand our progra. We will add a module for verifying bit accuracy, a way to continue training a model incrementally, and of course a function to store the model as a ".pb" file for sharing and publication if need be.
