@@ -221,6 +221,8 @@ Predicted first 32 bits as bytes (hex): 348b3e75
 Bit accuracy: 53.12% (17/32 bits correct)
 Overall accuracy across all tests: 46.88%
 ```
+### Please dig into the visualizations in the 'cnn' folder for further results.
+
 ------------------------------------------------------------------------------------------------------------
 
 ### Further Research

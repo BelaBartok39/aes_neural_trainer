@@ -1,0 +1,2 @@
+loss: 7.026860
+compile_metrics: 0.292467
