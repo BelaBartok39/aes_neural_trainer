@@ -122,7 +122,105 @@ This is quite promising! In fact, the model was able to predict more than one bi
 This is quite unbelievable, almost too good to be true. We need to verify that we didn't just get a good initialization and that these results hold up under scrutiny.
 Naturally this means our next step is to expand our progra. We will add a module for verifying bit accuracy, a way to continue training a model incrementally, and of course a function to store the model as a ".pb" file for sharing and publication if need be.
 
+Picking back up, it was relatively easy to create a python program to take the model in question and run it through sanitized, seperated data sets and do bitwise analysis. For a different approach
+I generated random plaintext and ran it through AES module, then put the same plaintext through the suspicious model. I have uploaded the scrutinize.py file for deeper inspection. 
 
+As far as the results...
+It was indeed too good to be true. The model DID NOT hold up under testing and is most likely a case of:
+
+## What Happened: The Technical Explanation
+
+### Data Leakage: 
+The most likely explanation is that your original training process had significant data leakage between the training and validation sets. This means:
+
+- The same plaintext-key-ciphertext combinations (or variants) appeared in both sets
+- The model wasn't learning to predict AES; it was memorizing specific examples
+- On truly fresh data, it couldn't generalize and reverted to random guessing
+
+
+### False Convergence: 
+The training graphs showing both training and validation accuracy reaching 99% were misleading because:
+
+- The validation set wasn't truly independent from the training set
+- The model was essentially being tested on data it had already seen (directly or indirectly)
+
+
+### Overfitting to Dataset Artifacts: 
+The original dataset likely contained unintentional patterns:
+
+- Perhaps using a limited set of keys or plaintexts
+- Possibly having some structure in how examples were generated
+- The model exploited these artifacts during training
+
+Here are some outputs from the verification and scrutiny script.
+
+```
+=== Bit-Level Analysis ===
+Mean bit accuracy: 0.500202 (±0.003771)
+Bits above 51.0% accuracy: 0/32 (0.00%)
+Top 5 performing bits:
+  Bit 28: 0.506933 accuracy
+  Bit 2: 0.506867 accuracy
+  Bit 20: 0.506133 accuracy
+  Bit 9: 0.505867 accuracy
+  Bit 8: 0.505267 accuracy
+Bottom 5 performing bits:
+  Bit 31: 0.491133 accuracy
+  Bit 19: 0.492667 accuracy
+  Bit 27: 0.495867 accuracy
+  Bit 13: 0.496533 accuracy
+  Bit 3: 0.497000 accuracy
+=== Confusion Matrix Analysis ===
+Overall Binary Classification Metrics:
+  Accuracy: 0.500202
+  Precision: 0.499637
+  Recall: 0.505475
+  Specificity: 0.494941
+  F1 Score: 0.502539
+=== ROC Curve Analysis ===
+=== Randomization Test ===
+Running inference with shuffled labels (sanity check)...
+Accuracy against random labels: 0.503662 (should be ~0.5)
+=== Analysis Summary ===
+Detailed analysis saved to: fresh_model_analysis
+  • Overall bit accuracy: 0.500202
+  • Bits above threshold: 0/32
+  • Overall ROC AUC: 0.500218
+Overall bit accuracy: 0.5002
+Best performing bit: 28 with accuracy 0.5069
+Worst performing bit: 31 with accuracy 0.4911
+
+```
+And the plaintext experiment was even worse, showing that the model performed WORSE than a coin toss. It should be mentioned again that this is not a failure but a success
+for AES standards. Proving that the algorithm holds up under the powerful NN is very good for the world. On the other hand, this does not mean we will stop. Next we will work on
+generating thousands of ciphertext and measuring the hamming distance between them, plotting this on a similarity matrix. Perhaps it is possible to find a pattern.
+
+```
+Test 1:
+
+Plaintext (hex): 54686973206973206120746573742121
+Key (hex): 53757065725365637265744b65792121
+Actual ciphertext (hex): b2c6e896f778c99c42d9661373dd5390
+Predicted first 32 bits as bytes (hex): 6acb5f24
+Bit accuracy: 46.88% (15/32 bits correct)
+
+Test 2:
+
+Plaintext (hex): 416e6f74686572206578616d706c652e
+Key (hex): 53757065725365637265744b65792121
+Actual ciphertext (hex): a3c98f6302b32b00d3de4250c530bb0f
+Predicted first 32 bits as bytes (hex): 16283d0c
+Bit accuracy: 40.62% (13/32 bits correct)
+
+Test 3:
+
+Plaintext (hex): 48656c6c6f2c20776f726c6421212100
+Key (hex): 53757065725365637265744b65792121
+Actual ciphertext (hex): f09de404067378b423c171ae899319ce
+Predicted first 32 bits as bytes (hex): 348b3e75
+Bit accuracy: 53.12% (17/32 bits correct)
+Overall accuracy across all tests: 46.88%
+```
 ------------------------------------------------------------------------------------------------------------
 
 ### Further Research
