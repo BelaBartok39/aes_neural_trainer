@@ -114,6 +114,16 @@ Once again, we can see that we are no better than a coin toss. This isn't exactl
 
 This is quite promising! In fact, the model was able to predict more than one bit. We will retrain this model incrementally until it stalls. 
 
+## CNN Model
+
+![alt text](training_history_cnn.png)
+![alt text](bit_position_accuracy_cnn.png)
+
+This is quite unbelievable, almost too good to be true. We need to verify that we didn't just get a good initialization and that these results hold up under scrutiny.
+Naturally this means our next step is to expand our progra. We will add a module for verifying bit accuracy, a way to continue training a model incrementally, and of course a function to store the model as a ".pb" file for sharing and publication if need be.
+
+
+------------------------------------------------------------------------------------------------------------
 
 ### Further Research
 

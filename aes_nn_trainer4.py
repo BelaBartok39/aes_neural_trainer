@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 from tqdm import tqdm
+import aes_model_tools
 
 # --- Enhanced Configuration with GPU Optimization ---
 NUM_SAMPLES = 1000000  # 1M samples
@@ -19,7 +20,7 @@ LEARNING_RATE = 2e-3  # Slightly increased learning rate
 MIN_LEARNING_RATE = 1e-6
 MODEL_CHECKPOINT_PATH = "aes_nn_models"
 USE_ATTENTION = True  # Added attention mechanisms
-MODEL_TYPE = "hybrid"  # Options: "dense", "cnn", "transformer", "hybrid"
+MODEL_TYPE = "cnn"  # Options: "dense", "cnn", "transformer", "hybrid"
 XLA_ACCELERATION = True  # Enable XLA compilation for faster execution
 MAX_BITS_TO_PREDICT = 32  # Try to predict only first 32 bits instead of all 128
 MODEL_COMPLEXITY = "ultra"  # Options: "normal", "high", "ultra"
