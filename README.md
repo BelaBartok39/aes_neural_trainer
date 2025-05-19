@@ -227,7 +227,9 @@ Predicted first 32 bits as bytes (hex): 348b3e75
 Bit accuracy: 53.12% (17/32 bits correct)
 Overall accuracy across all tests: 46.88%
 ```
-### Please dig into the visualizations in the 'cnn' folder for further results.
+(Please dig into the visualizations in the 'cnn' folder for further results.)
+
+### Fixed-Plaintext Pattern Trainer 
 
 Alright, up to this point we have been picking the low hanging fruit, and crossing it off our list. For this reason, I have
 limited how much detail to go into. From this point, however, we are going to get a bit more technical and start training much
@@ -236,7 +238,7 @@ larger networks.
 So we go back to the drawing board, consult Claude, and try to create a program resistant to these pitfalls. Let's outline the framework
 to not only take advantage of the NVIDIA A100 and TESLA V100 processors we have access to but scrutinize the data creation and collection process.
 
-The following approach, at a highlevel, takes a small set of plaintext and encrypts each plaintext with 5000 different keys. The data is 
+The following approach, at a high level, takes a small set of plaintext and encrypts each plaintext with 5000 different keys. The data is 
 analyzed, the network is trained on that data, and we look for and reproducibility from that model.
 
 ![alt text](images/fixed_plaintext_data_generation.png)
@@ -250,9 +252,15 @@ analyzed, the network is trained on that data, and we look for and reproducibili
 ![alt text](images/fixed_plaintext_final_model_training.png)
 
 
+
+Results coming soon
+
+
 ------------------------------------------------------------------------------------------------------------
 
 May 19, 2025
+
+### Piece-Wise Training 
 
 Let's talk about the piece-wise approach to learning. The idea is that we break down the AES process and attempt to use an individual NN model (specialized if necessary) 
 to learn each step of that process. We will then start putting the parts back together. Add a process, train, add a process, and so on until we have a model that is more acccurate that 
