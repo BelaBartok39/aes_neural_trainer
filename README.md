@@ -10,11 +10,12 @@ The primary objective of this experiment is to develop and train a neural networ
 3.  Experimenting with different optimizations.
 4.  Training the model on the generated dataset.
 5.  Evaluating the model's performance in predicting ciphertexts.
-6.  Utilizing CUDA and a NVIDIA 3070 GPU for acceleration for efficient training.
 
-## 2. Process and Walkthrough
+## 2. Initial Process and Walkthrough
 
 The experiment has progressed through several stages, with a significant focus on environment setup and troubleshooting GPU compatibility for TensorFlow. We begin with a simple MLP setup and a small data set.
+The first experiements were done using an NVIDIA 3070. These are basic experiments to prove that a neural network cannot simply learn the 
+AES process just by observing outputs and trying to detect some pattern.
 
 ### Data Generation:
 ```python
@@ -122,6 +123,11 @@ This is quite promising! In fact, the model was able to predict more than one bi
 This is quite unbelievable, almost too good to be true. We need to verify that we didn't just get a good initialization and that these results hold up under scrutiny.
 Naturally this means our next step is to expand our progra. We will add a module for verifying bit accuracy, a way to continue training a model incrementally, and of course a function to store the model as a ".pb" file for sharing and publication if need be.
 
+
+------------------------------------------------------------------------------------
+
+May 18, 2025
+
 Picking back up, it was relatively easy to create a python program to take the model in question and run it through sanitized, seperated data sets and do bitwise analysis. For a different approach
 I generated random plaintext and ran it through AES module, then put the same plaintext through the suspicious model. I have uploaded the scrutinize.py file for deeper inspection. 
 
@@ -131,7 +137,7 @@ It was indeed too good to be true. The model DID NOT hold up under testing and i
 ## What Happened: The Technical Explanation
 
 ### Data Leakage: 
-The most likely explanation is that your original training process had significant data leakage between the training and validation sets. This means:
+The most likely explanation is that the original training process had significant data leakage between the training and validation sets. This means:
 
 - The same plaintext-key-ciphertext combinations (or variants) appeared in both sets
 - The model wasn't learning to predict AES; it was memorizing specific examples
@@ -223,21 +229,39 @@ Overall accuracy across all tests: 46.88%
 ```
 ### Please dig into the visualizations in the 'cnn' folder for further results.
 
+Alright, up to this point we have been picking the low hanging fruit, and crossing it off our list. For this reason, I have
+limited how much detail to go into. From this point, however, we are going to get a bit more technical and start training much
+larger networks.
+
+So we go back to the drawing board, consult Claude, and try to create a program resistant to these pitfalls. Let's outline the framework
+to not only take advantage of the NVIDIA A100 and TESLA V100 processors we have access to but scrutinize the data creation and collection process.
+
+The following approach, at a highlevel, takes a small set of plaintext and encrypts each plaintext with 5000 different keys. The data is 
+analyzed, the network is trained on that data, and we look for and reproducibility from that model.
+
+![alt text](images/fixed_plaintext_data_generation.png)
+
+![alt text](images/fixed_plaintext_dataset_structure.png)
+
+![alt text](images/fixed_plaintext_training_data_prep.png)
+
+![alt text](images/fixed_plaintext_kfold_diagram.png)
+
+![alt text](images/fixed_plaintext_final_model_training.png)
+
+
 ------------------------------------------------------------------------------------------------------------
 
-### Further Research
+May 19, 2025
 
-1. **Focus on Specific AES Components**: Target specific AES operations (SubBytes, ShiftRows, etc.) instead of the entire encryption process
+Let's talk about the piece-wise approach to learning. The idea is that we break down the AES process and attempt to use an individual NN model (specialized if necessary) 
+to learn each step of that process. We will then start putting the parts back together. Add a process, train, add a process, and so on until we have a model that is more acccurate that 
+just random guessing. Immediate predictions could be made that, well, some parts can be learned and others cannot. After all, that is what makes AES so powerful. AES was 
+designed to be resistant to the most powerful and advanced computers on earth. At the end of the experiment we HOPE to find that is true. Let's first look at a few diagrams breaking down the
+approach.
 
-2. **Reduce Problem Scope**: Try predicting even fewer bits (8 or 16) to further concentrate learning capacity
+![alt text](image/piecewise_approach.png)
 
-3. **Explore Adversarial Approaches**: Implement a GAN-like architecture with competing networks
+![alt text](images/nn_architectures.png)
 
-4. **Analyze Round Keys**: Focus on the key expansion algorithm which might have more learnable patterns
-
-5. **Compute Correlation Analysis**: Add mutual information calculations between input bits and output bits
-
-
-
-
-
+![alt text](images/aes_round_operations)
