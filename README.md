@@ -253,12 +253,12 @@ analyzed, the network is trained on that data, and we look for and reproducibili
 
 These results from our scaled-up experiment provide compelling scientific evidence about AES's security properties.
 
-Bit Importance Analysis
+Bit Importance Analysis\
 The bit importance graph shows which bits in the ciphertext contribute most to classification decisions:
 
-Extremely Small Magnitudes: All importance scores are in the 10^-4 range or smaller, indicating minimal impact of any specific bit on prediction accuracy.
-No Consistent Pattern: The importance scores are distributed across all bit positions without any clear structure or pattern.
-Negative Values: Several bits show negative importance (particularly around bit 85), suggesting shuffling these bits actually improved classification slightly - a statistical artifact rather than a meaningful pattern.
+Extremely Small Magnitudes: All importance scores are in the 10^-4 range or smaller, indicating minimal impact of any specific bit on prediction accuracy.\
+No Consistent Pattern: The importance scores are distributed across all bit positions without any clear structure or pattern.\
+Negative Values: Several bits show negative importance (particularly around bit 85), suggesting shuffling these bits actually improved classification slightly - a statistical artifact rather than a meaningful pattern.\
 Slight Variations: While some bits (positions ~40, ~105, ~120) show slightly higher importance than others, the magnitude is so small that it's essentially statistical noise.
 
 ![alt text](images/aes_large_trainer_analysis(FixedText)/bit_importance.png)
