@@ -280,9 +280,9 @@ No Exploitable Bit Patterns: The bit importance analysis shows no consistent vul
 
 Resistant to Large-Scale Analysis: Even with:
 
-500,000 training samples
-Advanced neural network architecture
-Sophisticated analysis techniques
+500,000 training samples\
+Advanced neural network architecture\
+Sophisticated analysis techniques\
 Powerful A100 GPUs
 
 ...the model still failed to find meaningful patterns.
