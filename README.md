@@ -256,29 +256,31 @@ These results from our scaled-up experiment provide compelling scientific eviden
 Bit Importance Analysis\
 The bit importance graph shows which bits in the ciphertext contribute most to classification decisions:
 
-Extremely Small Magnitudes: All importance scores are in the 10^-4 range or smaller, indicating minimal impact of any specific bit on prediction accuracy.\
-No Consistent Pattern: The importance scores are distributed across all bit positions without any clear structure or pattern.\
-Negative Values: Several bits show negative importance (particularly around bit 85), suggesting shuffling these bits actually improved classification slightly - a statistical artifact rather than a meaningful pattern.\
-Slight Variations: While some bits (positions ~40, ~105, ~120) show slightly higher importance than others, the magnitude is so small that it's essentially statistical noise.
+**Extremely Small Magnitudes**: All importance scores are in the 10^-4 range or smaller, indicating minimal impact of any specific bit on prediction accuracy.\
+**No Consistent Pattern**: The importance scores are distributed across all bit positions without any clear structure or pattern.\
+**Negative Values**: Several bits show negative importance (particularly around bit 85), suggesting shuffling these bits actually improved classification slightly - a statistical artifact rather than a meaningful pattern.\
+**Slight Variations**: While some bits (positions ~40, ~105, ~120) show slightly higher importance than others, the magnitude is so small that it's essentially statistical noise.
 
 ![alt text](images/aes_large_trainer_analysis(FixedText)/bit_importance.png)
 
 Training Performance
 
-Minimal Learning: The validation accuracy (orange line) hovers around 0.0104 (1.04%), just 0.04% above the random baseline of 1% for 100 plaintexts.
-Classic Overfitting: Training accuracy (blue line) rises to 1.27% while validation remains flat - the model is memorizing rather than learning generalizable patterns.
-Validation Loss Explosion: After epoch 15, validation loss increases dramatically, a clear indicator that the model is failing to find useful patterns despite extensive training.
-Early Stopping: Training appears to have stopped around epoch 20, triggered by the validation performance plateau.
+**Minimal Learning**: The validation accuracy (orange line) hovers around 0.0104 (1.04%), just 0.04% above the random baseline of 1% for 100 plaintexts.\
+**Classic Overfitting**: Training accuracy (blue line) rises to 1.27% while validation remains flat - the model is memorizing rather than learning generalizable patterns.\
+**Validation Loss Explosion**: After epoch 15, validation loss increases dramatically, a clear indicator that the model is failing to find useful patterns despite extensive training.\
+**Early Stopping**: Training appears to have stopped around epoch 20, triggered by the validation performance plateau.
 
 ![alt text](images/aes_large_trainer_analysis(FixedText)/final_model_training_history.png)
 
 Well, there you have it. At least as far as this experiment is concerned, these results provide strong evidence for AES's security properties. 
 
-Statistically Insignificant Improvement: The 0.04% improvement over random guessing has no practical or statistical significance.
+**Statistically Insignificant Improvement**: The 0.04% improvement over random guessing has no practical or statistical significance.
 
-No Exploitable Bit Patterns: The bit importance analysis shows no consistent vulnerabilities in specific bit positions.
+**No Exploitable Bit Patterns**: The bit importance analysis shows no consistent vulnerabilities in specific bit positions.
 
-Resistant to Large-Scale Analysis: Even with:
+**Resistant to Large-Scale Analysis**
+
+Even with:
 
 500,000 training samples\
 Advanced neural network architecture\
