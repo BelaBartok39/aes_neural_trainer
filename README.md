@@ -273,7 +273,7 @@ approach.
 
 ![alt text](images/nn_architectures.png)
 
-![alt text](images/aes_round_operations)
+![alt text](images/aes_round_operations.png)
 
 
 
