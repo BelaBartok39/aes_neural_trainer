@@ -11,7 +11,7 @@ The primary objective of this experiment is to develop and train a neural networ
 4.  Training the model on the generated dataset.
 5.  Evaluating the model's performance in predicting ciphertexts.
 
-## 2. Initial Process and Walkthrough
+## 2. Initial/Basic Trainer
 
 The experiment has progressed through several stages, with a significant focus on environment setup and troubleshooting GPU compatibility for TensorFlow. We begin with a simple MLP setup and a small data set.
 The first experiements were done using an NVIDIA 3070. These are basic experiments to prove that a neural network cannot simply learn the 
@@ -28,7 +28,7 @@ return np.unpackbits(np.frombuffer(plaintext, dtype=np.uint8)),
 np.unpackbits(np.frombuffer(key, dtype=np.uint8)),
 np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
 ```
-### Model:
+### Basic Model Trainer:
 
 ```python
     model = keras.Sequential([
@@ -57,7 +57,7 @@ np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
                   metrics=['accuracy']) # 'accuracy' here is bitwise accuracy
     return model
 ```
-![alt text](images/image.png)
+![alt text](images/basic_trainer_results/image.png)
 
 1. Initial model was a Keras Sequential with 2 hidden layers (1024 units each, ReLU), a smaller hidden layer (512 units, ReLU), and an output layer (128 units, sigmoid). Also added Batch Normalization and Dropout. 
 2. For training, I used the Adam optimizer and binary cross-entropy loss, also stopping early if enough epochs went by without a drop in validation loss.
@@ -67,7 +67,7 @@ np.unpackbits(np.frombuffer(ciphertext, dtype=np.uint8))
 
 ## Initial Results
 
-![alt text](images/training_history.png)
+![alt text](images/basic_trainer_results/training_history.png)
 
 ```
 accuracy: 9.2557e-04 - auc: 0.5004 - loss: 0.6934 - precision: 0.5004 - recall: 0.4524
@@ -77,7 +77,7 @@ accuracy: 9.2557e-04 - auc: 0.5004 - loss: 0.6934 - precision: 0.5004 - recall: 
 - We may as well be flipping a coin, with zero bits predicted correctly.
 - In the next iteration, we will use AI to optimize and create a transformer model.
 
-## Updating the model
+## Updating The Basic Model
 
 - We now have a choice of 4 architectures (CNN, Dense, Transformer, and Hybrid)
 - We will also reduce the problem size by trying to predict only the first 32 bits instead of all 128.
@@ -101,24 +101,24 @@ You may also look at the python files to examine the models individually.
 
 ## Transformer Model
 
-![alt text](images/training_history_transformer.png)
+![alt text](images/basic_trainer_results/training_history_transformer.png)
 
-![alt text](images/bit_position_accuracy_transformer.png)
+![alt text](images/basic_trainer_results/bit_position_accuracy_transformer.png)
 
 Once again, we can see that we are no better than a coin toss. This isn't exactly a failure and, in fact, just shows the robust and secure nature of AES. These results are exactly what would be expected in an initial experiement.
 
 ## Hybrid Model
 
-![alt text](images/training_history_hybrid.png)
+![alt text](images/basic_trainer_results/training_history_hybrid.png)
 
-![alt text](images/bit_position_accuracy_hybrid.png)
+![alt text](images/basic_trainer_results/bit_position_accuracy_hybrid.png)
 
 This is quite promising! In fact, the model was able to predict more than one bit. We will retrain this model incrementally until it stalls. 
 
 ## CNN Model
 
-![alt text](images/training_history_cnn.png)
-![alt text](images/bit_position_accuracy_cnn.png)
+![alt text](images/basic_trainer_results/training_history_cnn.png)
+![alt text](images/basic_trainer_results/bit_position_accuracy_cnn.png)
 
 This is quite unbelievable, almost too good to be true. We need to verify that we didn't just get a good initialization and that these results hold up under scrutiny.
 Naturally this means our next step is to expand our progra. We will add a module for verifying bit accuracy, a way to continue training a model incrementally, and of course a function to store the model as a ".pb" file for sharing and publication if need be.
@@ -229,7 +229,7 @@ Overall accuracy across all tests: 46.88%
 ```
 (Please dig into the visualizations in the 'cnn' folder for further results.)
 
-### Fixed-Plaintext Pattern Trainer 
+## Fixed-Plaintext Pattern Trainer 
 
 Alright, up to this point we have been picking the low hanging fruit, and crossing it off our list. For this reason, I have
 limited how much detail to go into. From this point, however, we are going to get a bit more technical and start training much
@@ -251,17 +251,47 @@ analyzed, the network is trained on that data, and we look for and reproducibili
 
 ![alt text](images/fixed_plaintext_final_model_training.png)
 
+These results from our scaled-up experiment provide compelling scientific evidence about AES's security properties.
 
+Bit Importance Analysis
+The bit importance graph shows which bits in the ciphertext contribute most to classification decisions:
 
-Results coming soon
+Extremely Small Magnitudes: All importance scores are in the 10^-4 range or smaller, indicating minimal impact of any specific bit on prediction accuracy.
+No Consistent Pattern: The importance scores are distributed across all bit positions without any clear structure or pattern.
+Negative Values: Several bits show negative importance (particularly around bit 85), suggesting shuffling these bits actually improved classification slightly - a statistical artifact rather than a meaningful pattern.
+Slight Variations: While some bits (positions ~40, ~105, ~120) show slightly higher importance than others, the magnitude is so small that it's essentially statistical noise.
 
+![alt text](images/aes_large_trainer_analysis(FixedText)/bit_importance.png)
 
+Training Performance
+
+Minimal Learning: The validation accuracy (orange line) hovers around 0.0104 (1.04%), just 0.04% above the random baseline of 1% for 100 plaintexts.
+Classic Overfitting: Training accuracy (blue line) rises to 1.27% while validation remains flat - the model is memorizing rather than learning generalizable patterns.
+Validation Loss Explosion: After epoch 15, validation loss increases dramatically, a clear indicator that the model is failing to find useful patterns despite extensive training.
+Early Stopping: Training appears to have stopped around epoch 20, triggered by the validation performance plateau.
+
+![alt text](images/aes_large_trainer_analysis(FixedText)/final_model_training_history.png)
+
+Well, there you have it. At least as far as this experiment is concerned, these results provide strong evidence for AES's security properties. 
+
+Statistically Insignificant Improvement: The 0.04% improvement over random guessing has no practical or statistical significance.
+
+No Exploitable Bit Patterns: The bit importance analysis shows no consistent vulnerabilities in specific bit positions.
+
+Resistant to Large-Scale Analysis: Even with:
+
+500,000 training samples
+Advanced neural network architecture
+Sophisticated analysis techniques
+Powerful A100 GPUs
+
+...the model still failed to find meaningful patterns.
 
 ------------------------------------------------------------------------------------------------------------
 
 May 19, 2025
 
-### Piece-Wise Training 
+## Piece-Wise Training 
 
 Let's talk about the piece-wise approach to learning. The idea is that we break down the AES process and attempt to use an individual NN model (specialized if necessary) 
 to learn each step of that process. We will then start putting the parts back together. Add a process, train, add a process, and so on until we have a model that is more acccurate that 
