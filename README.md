@@ -256,6 +256,7 @@ analyzed, the network is trained on that data, and we look for and reproducibili
 Results coming soon
 
 
+
 ------------------------------------------------------------------------------------------------------------
 
 May 19, 2025
@@ -268,8 +269,11 @@ just random guessing. Immediate predictions could be made that, well, some parts
 designed to be resistant to the most powerful and advanced computers on earth. At the end of the experiment we HOPE to find that is true. Let's first look at a few diagrams breaking down the
 approach.
 
-![alt text](image/piecewise_approach.png)
+![alt text](images/piecewise_approach.png)
 
 ![alt text](images/nn_architectures.png)
 
 ![alt text](images/aes_round_operations)
+
+
+
