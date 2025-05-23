@@ -97,8 +97,8 @@ def generate_gf_multiply_dataset(num_samples, multiplier=2):
     # Convert to bit representation - multiple formats for experimentation
     
     # 1. Bit vector representation (8 bits per input/output)
-    X_bits = np.unpackbits(X, axis=1)
-    y_bits = np.unpackbits(y, axis=1)
+    X_bits = np.unpackbits(X.astype(np.uint8), axis=1)
+    y_bits = np.unpackbits(y.astype(np.uint8), axis=1)
     
     # 2. Normalized byte representation (0-255 -> 0-1)
     X_norm = X.astype(np.float32) / 255.0
@@ -203,17 +203,6 @@ def generate_gf_multiply_dataset(num_samples, multiplier=2):
     # 7. Mathematical guidance features
     # Create features explicitly guiding the model toward the correct mathematical operations
     X_math_guide = np.zeros((num_samples, 8 + 8 + 1), dtype=np.float32)
-
-    '''[[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
-        [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]'''
     
     # Include original bits
     X_math_guide[:, :8] = X_bits
@@ -273,8 +262,8 @@ def generate_full_mixcolumns_dataset(num_samples):
     
     for i in range(num_samples):
         for j in range(16):
-            X_bits[i, j*8:(j+1)*8] = np.unpackbits(X[i, j].reshape(1, -1))[0]
-            y_bits[i, j*8:(j+1)*8] = np.unpackbits(y[i, j].reshape(1, -1))[0]
+            X_bits[i, j*8:(j+1)*8] = np.unpackbits(np.array([X[i, j]], dtype=np.uint8).reshape(1, -1))[0]
+            y_bits[i, j*8:(j+1)*8] = np.unpackbits(np.array([y[i, j]], dtype=np.uint8).reshape(1, -1))[0]
     
     # Normalized representation
     X_norm = X.astype(np.float32) / 255.0
@@ -453,8 +442,8 @@ def generate_curriculum_dataset(num_samples, operation_type="mul2", difficulty=0
             
             for i in range(num_samples):
                 for j in range(16):
-                    X_bits[i, j*8:(j+1)*8] = np.unpackbits(easy_X[i, j].reshape(1, -1))[0]
-                    y_bits[i, j*8:(j+1)*8] = np.unpackbits(easy_y[i, j].reshape(1, -1))[0]
+                    X_bits[i, j*8:(j+1)*8] = np.unpackbits(np.array([easy_X[i, j]], dtype=np.uint8).reshape(1, -1))[0]
+                    y_bits[i, j*8:(j+1)*8] = np.unpackbits(np.array([easy_y[i, j]], dtype=np.uint8).reshape(1, -1))[0]
             
             dataset['X_bits'] = X_bits
             dataset['y_bits'] = y_bits
@@ -1730,8 +1719,8 @@ def analyze_gf_multiplication(model, multiplier=2):
     """Analyze GF(2^8) multiplication performance with mathematical validation"""
     print(f"\nAnalyzing GF(2^8) multiplication by {multiplier}...")
     
-    # Generate all possible inputs (0-255)
-    all_inputs = np.arange(256).reshape(-1, 1)
+    # Generate all possible inputs (0-255) - FIXED: explicitly use uint8 type
+    all_inputs = np.arange(256, dtype=np.uint8).reshape(-1, 1)
     
     # Prepare inputs for the model
     if hasattr(model, 'input_shape'):
@@ -1825,10 +1814,6 @@ def analyze_gf_multiplication(model, multiplier=2):
     plt.ylabel('Output Value')
     plt.title(f'GF(2^8) Multiplication by {multiplier} - Full Comparison')
     plt.legend()
-    plt.grid(plt.xlabel('Input Value'))
-    plt.ylabel('Output Value')
-    plt.title(f'GF(2^8) Multiplication by {multiplier} - Full Comparison')
-    plt.legend()
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
     plt.savefig(os.path.join(OUTPUT_DIR, f'gf_mul{multiplier}_full_comparison.png'), dpi=300)
@@ -1864,7 +1849,7 @@ def analyze_gf_multiplication(model, multiplier=2):
     if predictions.shape[1] == 8:
         pred_bits = pred_binary
     else:
-        pred_bits = np.unpackbits(pred_values.reshape(-1, 1), axis=1)
+        pred_bits = np.unpackbits(pred_values.astype(np.uint8).reshape(-1, 1), axis=1)
     
     bit_accuracies = []
     for i in range(8):
@@ -2131,8 +2116,16 @@ def analyze_mixcolumns_performance(model, test_data, num_samples=100):
     
     # Analyze bit-level accuracy for MixColumns
     # Convert to bit representation
-    y_raw_bits = np.unpackbits(y_raw.reshape(-1, 1), axis=1).reshape(num_samples, 16*8)
-    y_pred_bits = np.unpackbits(y_pred_bytes.reshape(-1, 1), axis=1).reshape(num_samples, 16*8)
+    # Calculate dimensions based on actual data:
+    y_raw_flat = y_raw.flatten()
+    total_bits = len(y_raw_flat) * 8
+    y_raw_bits = np.unpackbits(y_raw_flat.astype(np.uint8).reshape(-1, 1), axis=1)
+    y_raw_bits = y_raw_bits.reshape(num_samples, -1)  # Auto-determine second dimension
+    
+    # Same for predictions:
+    y_pred_flat = y_pred_bytes.flatten()
+    y_pred_bits = np.unpackbits(y_pred_flat.astype(np.uint8).reshape(-1, 1), axis=1)
+    y_pred_bits = y_pred_bits.reshape(num_samples, -1)  # Auto-determine second dimension
     
     bit_accuracies = []
     for i in range(16*8):

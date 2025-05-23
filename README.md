@@ -400,6 +400,10 @@ Several specialized architectures:
 
 The bit-level models have achieved perfect accuracy (100%) for both GF(2^8) × 2 and GF(2^8) × 3 operations. This is remarkable and shows that the mathematical structure of these field operations is completely learnable by neural networks when properly represented.
 
+![alt text](images/piecewise_trainer_results/super_gf_trainer/gf_mul2_correct_vs_incorrect.png)
+
+![alt text](images/piecewise_trainer_results/super_gf_trainer/gf_mul3_correct_vs_incorrect.png)
+
 - Binary MLP, Bit Interaction, and Attention models: All achieved 100% bit-level and byte-level accuracy
 - GF(3) Ensemble: Perfect 100% accuracy, a 98.83% improvement over previous results
 
