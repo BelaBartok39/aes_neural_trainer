@@ -334,18 +334,24 @@ With our first implementation of a model, we break down the available operations
 ### Key Findings from GF Models:
 *GF(2^8) Multiplication by 2:*
 
-**Binary MLP**: 31.64% accuracy on all values, with perfect learning of 5 out of 8 bits
+**Binary MLP**: 31.64% accuracy on all values, with perfect learning of 5 out of 8 bits\
 **Structured Model**: 53.12% accuracy (136/256 values), with perfect learning of high-order bits
+
+![alt text](images/piecewise_trainer_results/mixrows/gf_trainer_basic/gf_mul2_bit_accuracy.png)
 
 *GF(2^8) Multiplication by 3*:
 
-**Binary MLP**: 22.66% accuracy (58/256 values), with perfect learning of 3 bits
+**Binary MLP**: 22.66% accuracy (58/256 values), with perfect learning of 3 bits\
 **Complex Model**: Only 1.17% accuracy (3/256 values), struggling significantly
+
+![alt text](images/piecewise_trainer_results/mixrows/gf_trainer_basic/gf_mul3_bit_accuracy.png)
 
 *MixColumns Component Model*:
 
-**Overall Performance**: 0.37% byte accuracy (6/1600 bytes)
+**Overall Performance**: 0.37% byte accuracy (6/1600 bytes)\
 **Column-wise**: Very low accuracy across all columns (0-1%)
+
+![alt text](images/piecewise_trainer_results/mixrows/gf_trainer_basic/mixcolumns_column_accuracy.png)
 
 ### Interpretation:
 
@@ -358,3 +364,95 @@ Operation Complexity Hierarchy: Clear evidence that:
 ### The Good News
 Structure Helps: The structured model for GF(2^8) × 2 doubled the accuracy of the pure neural approach (53% vs 31%), confirming that architectural inductive bias is crucial.
 
+## What now?
+
+Well, I think we can do better and thus we will try and improve the trainer. Without going into the code and complicated details, we will look at the results of this improved trainer. Here are the structural changes:
+
+### Key Improvements
+
+**1. Mathematical Structure**\
+The new implementation explicitly encodes the mathematical structure of GF(2^8) operations by:
+
+- Creating specialized layers that model polynomial operations
+- Incorporating the AES irreducible polynomial (x^8 + x^4 + x^3 + x + 1)
+- Building bit-level interactions that follow field arithmetic rules
+
+**2. Curriculum Learning**\
+Progressive training helps models learn gradually:
+
+- Starting with simple cases (no reduction needed)
+- Moving to medium complexity (limited bit interactions)
+- Finally tackling the full complexity of GF operations
+
+**3. Model Architectures**\
+Several specialized architectures:
+
+- GaloisPolynomialLayer - Models polynomial operations in GF(2^8)
+- EnhancedXORLayer - Provides differentiable approximation of XOR
+- ModularReductionLayer - Learns polynomial reduction
+- MixColumnsMatrixLayer - Explicitly models the matrix operation
+
+### And the results...
+
+
+
+**1. Perfect Learning of Basic GF Operations**
+
+The bit-level models have achieved perfect accuracy (100%) for both GF(2^8) × 2 and GF(2^8) × 3 operations. This is remarkable and shows that the mathematical structure of these field operations is completely learnable by neural networks when properly represented.
+
+- Binary MLP, Bit Interaction, and Attention models: All achieved 100% bit-level and byte-level accuracy
+- GF(3) Ensemble: Perfect 100% accuracy, a 98.83% improvement over previous results
+
+**2. Structured vs. Neural Approaches**
+
+Interestingly, the neural approaches significantly outperformed the structured mathematical models:
+
+- Pure neural approaches (Binary MLP, Bit Interaction): Perfect performance
+- Structured mathematical models: Very poor performance (0.44% for GF(2), 0% for GF(3))
+- Ensemble weights for GF(3): [0.472, 0.472, 0.0, 0.056] - essentially ignoring the structured model
+
+This suggests that while we're trying to explicitly encode mathematical structure, the neural networks are more efficient at discovering patterns directly from the data.
+
+**3. MixColumns Remains Challenging**
+
+Despite perfect learning of individual GF operations, the MixColumns operation remains extremely difficult:
+
+![alt text](images/piecewise_trainer_results/mixrows/improved_gf_trainer/mixcolumns_bit_accuracy.png)
+
+- Component-based Model: 0.48% byte-level accuracy
+- Hybrid Model: 0.39% byte-level accuracy
+- Ensemble: 0.49% byte-level accuracy (slight improvement from 0.37%)
+
+![alt text](images/piecewise_trainer_results/mixrows/improved_gf_trainer/pred_vs_true.png)
+
+This dramatic drop in performance from single operations to composed operations demonstrates the "scalability challenge" in learning cryptographic functions.
+
+**4. GF(2^8) × 2 Ensemble Issue**
+
+There appears to be a bug in the GF(2^8) × 2 ensemble calculation, as it reports 0% accuracy despite all component models achieving perfect accuracy. This accounts for the reported 53.12% decline in performance.
+
+**Key Insights and Recommendations**
+
+Bit-level Representation is Key: The superior performance of bit-level models confirms that bitwise operations in GF(2^8) are highly learnable when properly represented.
+Composition is Hard: Neural networks can learn basic operations perfectly but struggle with their composition (MixColumns), suggesting that:
+
+**Larger models may be needed for MixColumns**\
+A hierarchical approach might work better (pre-train the GF operations, then use them as frozen components)
+
+**Mathematical Structure Not Helping:**\
+The explicit mathematical structure doesn't seem to help compared to letting networks learn from examples. This suggests that for these specific operations, data-driven learning might be more effective than explicit mathematical guidance.
+Scale Up for MixColumns: The MixColumns task likely needs:
+
+**Much larger datasets (10-100× current size)**\
+Deeper networks with more specialized architectures
+Curriculum learning focused solely on this operation
+
+These results demonstrate that simple Galois Field operations can be perfectly learned by neural networks, but the composition of these operations into more complex functions like MixColumns remains a significant challenge. This aligns with the general understanding that cryptographic primitives are designed to resist these types of learning approaches.
+
+## Fork in the Road
+
+So this is where we are at, a fork in the road. Do we continue to try and massage the models into learning GF operations and repairing bugs that come up as the code gets more and more complex? 
+
+Or do we stop and say, more or less, neural networks cannot be trained to learn the AES operations? 
+
+There has been research that shows  our current results aligned with others. It also suggests that the consensus is that neural networks may be able to assist AES instead of learn it. In other words, using them to improve particular operations in AES but not replacing the mathematic foundation that it relies on. A foundation that is so sound, we have thus far been unable to make a dent. 
