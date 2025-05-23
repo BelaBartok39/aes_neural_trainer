@@ -305,7 +305,7 @@ May 19, 2025
 Let's talk about the piece-wise approach to learning. The idea is that we break down the AES process and attempt to use an individual NN model (specialized if necessary) 
 to learn each step of that process. We will then start putting the parts back together. Add a process, train, add a process, and so on until we have a model that is more acccurate that 
 just random guessing. Immediate predictions could be made that, well, some parts can be learned and others cannot. After all, that is what makes AES so powerful. AES was 
-designed to be resistant to the most powerful and advanced computers on earth. At the end of the experiment we HOPE to find that is true. Let's first look at a few diagrams breaking down the
+designed to be resistant to the most powerful and advanced computers on earth. At the end of the experiment we HOPE to find that is true. Let's first look at a few diagrams breaking down theS
 approach.
 
 ![alt text](images/piecewise_approach.png)
@@ -314,5 +314,9 @@ approach.
 
 ![alt text](images/aes_round_operations.png)
 
+Our first run yields both interesting and expected results, more so the latter. The neural network was able to achieve perfect S-box accuracy. We were also able to yield perfect shift row accuracy but this is not completely surprising as these are simply learning the lookup tables and shift rows around. The challenge comes to the ability to yield any meaningful results with mixed columns.
 
+![alt text](images/piecewise_trainer_results/shiftrow_comp_table.png)
+
+This is mainly due to the Galois Field Arithmetic that is required to accomplish the mixed row process. In our first run, the model fails miserably in an attempt to replicate it without any pretrained knowledge of the Galois Field rules. 
 
