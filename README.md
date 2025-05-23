@@ -316,7 +316,45 @@ approach.
 
 Our first run yields both interesting and expected results, more so the latter. The neural network was able to achieve perfect S-box accuracy. We were also able to yield perfect shift row accuracy but this is not completely surprising as these are simply learning the lookup tables and shift rows around. The challenge comes to the ability to yield any meaningful results with mixed columns.
 
-![alt text](images/piecewise_trainer_results/shiftrow_comp_table.png)
+![alt text](images/piecewise_trainer_results/sbox/mlp_sbox_accuracy_per_value.png)
+
+![alt text](images/piecewise_trainer_results/shiftrows/mlp_bit_accuracies.png)
+
+![alt text](images/piecewise_trainer_results//shiftrows/shiftrow_comp_table.png)
 
 This is mainly due to the Galois Field Arithmetic that is required to accomplish the mixed row process. In our first run, the model fails miserably in an attempt to replicate it without any pretrained knowledge of the Galois Field rules. 
+
+So what can we do? 
+
+Well, this is where we go on a bit of a tangent. What if we could pretrain a model to learn only Galois Field Arithmetic? Then take that model and run it against our complete piecewise trainer, with that GF knowledge baked in.
+It's worth a shot and now we are on a journey of teaching a model to do Galois Field math. 
+
+With our first implementation of a model, we break down the available operations in Galois Field math and try to learn them individually. Here are the results:
+
+### Key Findings from GF Models:
+*GF(2^8) Multiplication by 2:*
+
+**Binary MLP**: 31.64% accuracy on all values, with perfect learning of 5 out of 8 bits
+**Structured Model**: 53.12% accuracy (136/256 values), with perfect learning of high-order bits
+
+*GF(2^8) Multiplication by 3*:
+
+**Binary MLP**: 22.66% accuracy (58/256 values), with perfect learning of 3 bits
+**Complex Model**: Only 1.17% accuracy (3/256 values), struggling significantly
+
+*MixColumns Component Model*:
+
+**Overall Performance**: 0.37% byte accuracy (6/1600 bytes)
+**Column-wise**: Very low accuracy across all columns (0-1%)
+
+### Interpretation:
+
+Bit-Level Success: The models are learning certain bit positions perfectly while struggling with others. This is a pattern we often see in cryptography - some parts of operations are much harder to learn than others.
+Operation Complexity Hierarchy: Clear evidence that:
+
+- Multiplication by 2 is easier than multiplication by 3
+- Individual operations are easier than the combined MixColumns
+
+### The Good News
+Structure Helps: The structured model for GF(2^8) × 2 doubled the accuracy of the pure neural approach (53% vs 31%), confirming that architectural inductive bias is crucial.
 
