@@ -460,3 +460,12 @@ So this is where we are at, a fork in the road. Do we continue to try and massag
 Or do we stop and say, more or less, neural networks cannot be trained to learn the AES operations? 
 
 There has been research that shows  our current results aligned with others. It also suggests that the consensus is that neural networks may be able to assist AES instead of learn it. In other words, using them to improve particular operations in AES but not replacing the mathematic foundation that it relies on. A foundation that is so sound, we have thus far been unable to make a dent. 
+
+### June 1, 2025
+
+I have made the call to continue the research by developing a system of models that will each be trained to do one part of the AES process. I will then use a master model to reference these models as it tries to learn AES encryption.
+You could easily call this technique AES Neural Microservices. This will help give extremely accurate measurments of where the model is breaking down mathematically and computationally. It also gives the master model the knowledge it needs to 
+stand a better chance. 
+
+To continue the adventure with me, click here:
+[AES_Neural_Microservices](https://github.com/BelaBartok39/AES_Neural_Microservices)
